@@ -5,6 +5,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import ku.cs.models.Student;
 import ku.cs.models.StudentList;
 import ku.cs.services.FXRouter;
@@ -18,11 +19,15 @@ public class StudentListController {
     @FXML private Label nameLabel;
     @FXML private Label scoreLabel;
 
+    @FXML private Label errorLabel;
+    @FXML private TextField giveScoreTextField;
+
     private StudentList studentList;
     private Student selectedStudent;
 
     @FXML
     public void initialize() {
+        errorLabel.setText("");
         clearStudentInfo();
         StudentHardCodeDatasource datasource = new StudentHardCodeDatasource();
         studentList = datasource.readData();
@@ -64,6 +69,32 @@ public class StudentListController {
             FXRouter.goTo("hello");
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
+    public void onGiveScoreButtonClick() {
+        if (selectedStudent != null) {
+            String scoreText = giveScoreTextField.getText();
+            String errorMessage = "";
+            try {
+                double score = Double.parseDouble(scoreText);
+                studentList.giveScoreToId(selectedStudent.getId(), score);
+                showStudentInfo(selectedStudent);
+            } catch (NumberFormatException e) {
+                errorMessage = "Please insert number value";
+                errorLabel.setText(errorMessage);
+            } catch (IllegalArgumentException e){
+                errorMessage = e.getMessage();
+                errorLabel.setText(errorMessage);
+            } finally {
+                if (errorMessage.equals("")) {
+                    giveScoreTextField.setText("");
+                }
+            }
+        } else {
+            giveScoreTextField.setText("");
+            errorLabel.setText("");
         }
     }
 }

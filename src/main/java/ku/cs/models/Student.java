@@ -18,9 +18,10 @@ public class Student {
     }
 
     public void addScore(double score) {
-        if (score > 0) {
-            this.score += score;
+        if (score <= 0) {
+            throw new IllegalArgumentException("Score must be greater than 0");
         }
+        this.score += score;
     }
 
     // TODO: design grading system for Student
